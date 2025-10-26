@@ -5,6 +5,8 @@ services:
     ports:
       - "12345:12345"
     environment:
+      - PORT=12345
+      - IP=0.0.0.0
       - PYTHONUNBUFFERED=1
     tty: true
     stdin_open: true
@@ -13,6 +15,8 @@ services:
     depends_on:
       - server
     environment:
+      - PORT=12345
+      - IP=server
       - PYTHONUNBUFFERED=1
     tty: true
     stdin_open: true

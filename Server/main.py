@@ -1,8 +1,6 @@
 import threading
 import socket
-from threading import Thread
-
-import dotenv
+import os
 import time
 from stream_reader import StreamReader
 from protobuf_reader import *
@@ -26,6 +24,7 @@ def output_items(items:list):
         print(f"Element №{counter}")
         print(f"Priority: {el["priority"]}")
         print(f"Value: {el["value"]}")
+        print()
         counter += 1
 
 
@@ -43,7 +42,9 @@ def handle_connection(con, abort_connection, retry=5):
             cnt += 1
             continue
 
+        #print(data)
         reader.read(data)
+        #print(reader.buffer)
         messages = reader.get_storage()
         if len(messages) > 0:
             reader.clear_storage()
@@ -89,10 +90,11 @@ def receive_connection(server: socket.socket, stop_receiving, retry=90):
 
 
 def main():
-    config = dotenv.dotenv_values(".env")
+    ip = os.getenv("IP", "localhost")
+    port = int(os.getenv("PORT", "12345"))
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind((config["IP"], int(config["PORT"])))
+    server.bind((ip, port))
     server.settimeout(5)
 
     stop_receiving = threading.Event()

@@ -5,7 +5,7 @@ class StreamReader:
     end_str = b"#E#"
     start_index = -1
 
-    def __init__(self, max_size=10000):
+    def __init__(self, max_size=100000):
         self.storage = []
         self.buffer = b""
         self.start_str = b"#S#"
@@ -17,20 +17,26 @@ class StreamReader:
         beg = max(0, len(self.buffer) -3)
         self.buffer += string
 
-        letter_pointer = 0
+        start_pointer = 0
+        end_pointer = 0
         for i in range(beg, len(self.buffer)):
-            if self.start_index == -1 and self.buffer[i] == self.start_str[letter_pointer]:
-                letter_pointer += 1
-                if letter_pointer == 3:
+            if self.buffer[i] == self.start_str[start_pointer]:
+                start_pointer += 1
+                if start_pointer >= 3:
                     self.start_index = i + 1
-                    letter_pointer = 0
-            elif self.start_index != -1 and self.buffer[i] == self.end_str[letter_pointer]:
-                letter_pointer += 1
-                if letter_pointer == 3:
+                    start_pointer = 0
+            else:
+                start_pointer = 0 + (self.buffer[i] == self.start_str[0])
+            if self.start_index != -1 and self.buffer[i] == self.end_str[end_pointer]:
+                end_pointer += 1
+                if end_pointer >= 3:
                     flag = True
-                    letter_pointer = 0
+                    end_pointer = 0
                     self.storage.append(self.buffer[self.start_index:i-2])
                     self.start_index = -1
+            else:
+                end_pointer = 0 + (self.buffer[i] == self.end_str[0])
+
 
         if len(self.buffer) > self.max_size:
             self.buffer = b""

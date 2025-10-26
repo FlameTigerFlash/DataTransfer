@@ -4,6 +4,7 @@ import threading
 import time
 import math
 import random
+import os
 from proto_writer import *
 
 message_accepted = True
@@ -47,13 +48,16 @@ def wait_for_reply(client: socket.socket, stop_receiving):
 def main():
     global message_accepted
 
+    ip = os.getenv("IP", "localhost")
+    port = int(os.getenv("PORT", "12345"))
+
     error_limit  = 20
 
     config = dotenv.dotenv_values(".env")
     #client.settimeout(50)
 
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    connected = client_connect(client, 'server', int(config["PORT"]))
+    connected = client_connect(client, ip, port)
     if not connected:
         print("Cannot connect... Finishing program.")
         return
@@ -63,13 +67,13 @@ def main():
     while True:
         if cnt >= error_limit:
             client = socket.socket()
-            connected = client_connect(client, config["IP"], int(config["PORT"]))
+            connected = client_connect(client, ip, port)
             if not connected:
                 print("Cannot connect... Finishing program.")
                 return
 
         items = []
-        for i in range(random.randint(3, 8)):
+        for i in range(random.randint(5, 10)):
             new_item = Item(random.randint(-20, 20))
             items.append(new_item)
 
